@@ -44,6 +44,7 @@ public final class EquipmentDTOConverter {
                 .supplier(equipment.getSupplier())
                 .manufacturer(equipment.getManufacturer())
                 .isAbnormal(equipment.getIsAbnormal())
+                .updatedAt(equipment.getUpdatedAt())
                 .build();
     }
 
@@ -107,6 +108,7 @@ public final class EquipmentDTOConverter {
                 .supplier(entity.getSupplier())
                 .manufacturer(entity.getManufacturer())
                 .isAbnormal(entity.getIsAbnormal())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 }

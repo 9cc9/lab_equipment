@@ -55,13 +55,15 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public List<Equipment> listByRoomCode(String roomCode, String keyword) {
+    public List<Equipment> listByRoomCode(String roomCode, String keyword, String usageStatus, String sortOrder) {
         AssertUtil.notBlank(roomCode, "房间编号不能为空");
         RoomEntity room = roomMapper.selectByRoomCode(roomCode.trim());
         if (room == null) {
             return new ArrayList<>();
         }
-        List<EquipmentEntity> entities = equipmentMapper.selectByRoomId(room.getId(), keyword);
+        String order = "asc".equalsIgnoreCase(sortOrder) ? "asc" : "desc";
+        String statusFilter = StringUtils.isBlank(usageStatus) ? null : usageStatus.trim();
+        List<EquipmentEntity> entities = equipmentMapper.selectByRoomId(room.getId(), keyword, statusFilter, order);
         List<Equipment> result = new ArrayList<>();
         for (EquipmentEntity entity : entities) {
             result.add(toEquipment(entity, room));
@@ -109,6 +111,7 @@ public class EquipmentServiceImpl implements EquipmentService {
         String source = StringUtils.isBlank(request.getSource()) ? "SCAN" : request.getSource();
         saveChangeLog(entity, "usageStatus", oldUsageStatus, request.getUsageStatus(), operatorId, operatorName, source, now);
         saveChangeLog(entity, "roomCode", oldRoomCode, room.getRoomCode(), operatorId, operatorName, source, now);
+        saveInspectionLog(entity, operatorId, operatorName, source, now);
 
         return toEquipment(entity, toRoomEntity(room));
     }
@@ -146,6 +149,16 @@ public class EquipmentServiceImpl implements EquipmentService {
         if (StringUtils.equals(StringUtils.defaultString(oldValue), StringUtils.defaultString(newValue))) {
             return;
         }
+        insertChangeLog(entity, fieldName, oldValue, newValue, operatorId, operatorName, source, now);
+    }
+
+    private void saveInspectionLog(EquipmentEntity entity, String operatorId, String operatorName,
+                                   String source, Date now) {
+        insertChangeLog(entity, "验收", null, "完成设备验收", operatorId, operatorName, source, now);
+    }
+
+    private void insertChangeLog(EquipmentEntity entity, String fieldName, String oldValue, String newValue,
+                                   String operatorId, String operatorName, String source, Date now) {
         EquipmentChangeLogEntity log = new EquipmentChangeLogEntity();
         log.setId(idGenerator.generate(IdGenerator.EntityType.CHANGE_LOG));
         log.setEquipmentId(entity.getId());

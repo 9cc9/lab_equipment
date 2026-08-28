@@ -35,4 +35,5 @@ public class Equipment {
     private String supplier;
     private String manufacturer;
     private Boolean isAbnormal;
+    private Date updatedAt;
 }

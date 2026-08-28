@@ -42,11 +42,13 @@ public class EquipmentController {
 
     @GetMapping("/rooms/{roomCode}/equipment.json")
     public BaseResult<List<EquipmentDTO>> listByRoom(@PathVariable("roomCode") String roomCode,
-                                                     @RequestParam(value = "keyword", required = false) String keyword) {
+                                                     @RequestParam(value = "keyword", required = false) String keyword,
+                                                     @RequestParam(value = "usageStatus", required = false) String usageStatus,
+                                                     @RequestParam(value = "sortOrder", required = false, defaultValue = "desc") String sortOrder) {
         return BizTemplate.execute(new AbstractBizCallback<List<EquipmentDTO>>() {
             @Override
             public void execute(BaseResult<List<EquipmentDTO>> result) {
-                List<Equipment> list = equipmentService.listByRoomCode(roomCode, keyword);
+                List<Equipment> list = equipmentService.listByRoomCode(roomCode, keyword, usageStatus, sortOrder);
                 List<EquipmentDTO> dtoList = new ArrayList<>();
                 for (Equipment equipment : list) {
                     dtoList.add(EquipmentDTOConverter.toDTO(equipment));

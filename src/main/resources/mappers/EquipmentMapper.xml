@@ -10,7 +10,17 @@
             OR name LIKE CONCAT('%', #{keyword}, '%')
             OR brand LIKE CONCAT('%', #{keyword}, '%'))
         </if>
-        ORDER BY asset_code
+        <if test="usageStatus != null and usageStatus != ''">
+            AND usage_status = #{usageStatus}
+        </if>
+        <choose>
+            <when test="sortOrder == 'asc'">
+                ORDER BY updated_at ASC, asset_code
+            </when>
+            <otherwise>
+                ORDER BY updated_at DESC, asset_code
+            </otherwise>
+        </choose>
     </select>
 
     <select id="search" resultType="org.uestc.weglas.base.dal.entity.EquipmentEntity">

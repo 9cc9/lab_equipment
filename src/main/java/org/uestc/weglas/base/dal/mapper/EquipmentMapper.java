@@ -19,7 +19,9 @@ public interface EquipmentMapper {
     EquipmentEntity selectById(@Param("id") String id);
 
     List<EquipmentEntity> selectByRoomId(@Param("roomId") String roomId,
-                                         @Param("keyword") String keyword);
+                                         @Param("keyword") String keyword,
+                                         @Param("usageStatus") String usageStatus,
+                                         @Param("sortOrder") String sortOrder);
 
     List<EquipmentEntity> search(@Param("keyword") String keyword);
 
