@@ -1,5 +1,6 @@
 package org.uestc.weglas.controller.helper;
 
+import org.apache.commons.lang.StringUtils;
 import org.uestc.weglas.biz.dto.LoginResponse;
 import org.uestc.weglas.biz.dto.UserDTO;
 import org.uestc.weglas.core.model.User;
@@ -31,7 +32,7 @@ public final class LoginSessionHelper {
                 .userId(user.getId())
                 .phone(user.getUsername())
                 .name(user.getName())
-                .userType("ADMIN")
+                .userType(StringUtils.isNotBlank(user.getUserType()) ? user.getUserType() : "ADMIN")
                 .build();
 
         sessionService.createSession(sessionToken, userContext, ttlSeconds);

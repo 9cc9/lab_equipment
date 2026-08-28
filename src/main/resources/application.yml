@@ -44,8 +44,8 @@ spring:
       maximum-pool-size: 20
       connection-timeout: 30000
     schema:
-#      - "classpath:db/schema.sql"
-#      - "classpath:db/test_data.sql"
+      - "classpath:db/schema.sql"
+      - "classpath:db/test_data.sql"
 
 app:
   cors:

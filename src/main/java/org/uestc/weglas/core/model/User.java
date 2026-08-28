@@ -11,4 +11,6 @@ public class User {
     private String name;
     private String password;
     private String status;
+    /** ADMIN 管理员，ASSISTANT 学生助管 */
+    private String userType;
 }
