@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+
+    <Properties>
+        <Property name="LOG_PATH">logs/</Property>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss} [%t] [%X{requestId}] %-5level %logger{36} - %msg%n</Property>
+    </Properties>
+
+    <!-- Console Appender -->
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <!-- 业务日志文件配置 -->
+        <RollingFile name="USER_PORTRAIT_BIZ" fileName="${LOG_PATH}/user-portrait-biz.log"
+                     filePattern="${LOG_PATH}/user-portrait-biz-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+
+        <!-- ERROR 级别日志文件配置 -->
+        <RollingFile name="ERROR_FILE" fileName="${LOG_PATH}/lab-equipment-error.log"
+                     filePattern="${LOG_PATH}/lab-equipment-error-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+            <Filters>
+                <ThresholdFilter level="error"/>
+            </Filters>
+        </RollingFile>
+
+        <!-- COMMON 级别日志文件配置 -->
+        <RollingFile name="COMMON_FILE" fileName="${LOG_PATH}/lab-equipment-common.log"
+                     filePattern="${LOG_PATH}/lab-equipment-common-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="7"/>
+            <Filters>
+                <ThresholdFilter level="debug"/>
+            </Filters>
+        </RollingFile>
+
+        <!-- API 请求响应明细日志 -->
+        <RollingFile name="API_LOG_FILE" fileName="${LOG_PATH}/api-request-response.log"
+                     filePattern="${LOG_PATH}/api-request-response-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+            <Filters>
+                <ThresholdFilter level="info"/>
+            </Filters>
+        </RollingFile>
+
+        <!-- API 访问摘要日志（耗时、success、resultCode、message，供 SLS 监控） -->
+        <RollingFile name="API_SUMMARY_LOG_FILE" fileName="${LOG_PATH}/api-access-summary.log"
+                     filePattern="${LOG_PATH}/api-access-summary-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+            <Filters>
+                <ThresholdFilter level="info"/>
+            </Filters>
+        </RollingFile>
+
+        <!-- SQL 访问摘要日志（耗时、mapperId、sql，与 API 摘要用 requestId 对齐） -->
+        <RollingFile name="SQL_SUMMARY_LOG_FILE" fileName="${LOG_PATH}/sql-access-summary.log"
+                     filePattern="${LOG_PATH}/sql-access-summary-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+            <Filters>
+                <ThresholdFilter level="info"/>
+            </Filters>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Logger 配置 -->
+        <Logger name="org.uestc.weglas" level="debug" additivity="false">
+            <AppenderRef ref="USER_PORTRAIT_BIZ"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- API 请求响应明细日志 -->
+        <Logger name="org.uestc.weglas.controller.aspect.LoggingAspect" level="info" additivity="false">
+            <AppenderRef ref="API_LOG_FILE"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- API 访问摘要日志 -->
+        <Logger name="org.uestc.weglas.controller.aspect.LoggingAspect.Summary" level="info" additivity="false">
+            <AppenderRef ref="API_SUMMARY_LOG_FILE"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- SQL 访问摘要日志 -->
+        <Logger name="org.uestc.weglas.base.dal.interceptor.MybatisSqlTimingInterceptor.Summary" level="info" additivity="false">
+            <AppenderRef ref="SQL_SUMMARY_LOG_FILE"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- Root Logger 配置 -->
+        <Root level="debug">
+            <AppenderRef ref="COMMON_FILE"/>
+            <AppenderRef ref="ERROR_FILE"/>
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+
+</Configuration>

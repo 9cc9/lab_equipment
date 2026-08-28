@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.uestc.weglas.base.dal.mapper.EquipmentChangeLogMapper">
+
+    <insert id="insert" parameterType="org.uestc.weglas.base.dal.entity.EquipmentChangeLogEntity">
+        INSERT INTO le_equipment_change_log (
+            id, equipment_id, asset_code, field_name, old_value, new_value,
+            operator_id, operator_name, source, created_at
+        ) VALUES (
+            #{id}, #{equipmentId}, #{assetCode}, #{fieldName}, #{oldValue}, #{newValue},
+            #{operatorId}, #{operatorName}, #{source}, #{createdAt}
+        )
+    </insert>
+</mapper>

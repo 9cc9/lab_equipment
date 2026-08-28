@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.uestc.weglas.base.dal.mapper.EquipmentMapper">
+
+    <select id="selectByRoomId" resultType="org.uestc.weglas.base.dal.entity.EquipmentEntity">
+        SELECT * FROM le_equipment
+        WHERE room_id = #{roomId}
+        <if test="keyword != null and keyword != ''">
+            AND (asset_code LIKE CONCAT('%', #{keyword}, '%')
+            OR name LIKE CONCAT('%', #{keyword}, '%')
+            OR brand LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY asset_code
+    </select>
+
+    <select id="search" resultType="org.uestc.weglas.base.dal.entity.EquipmentEntity">
+        SELECT * FROM le_equipment
+        WHERE asset_code LIKE CONCAT('%', #{keyword}, '%')
+           OR name LIKE CONCAT('%', #{keyword}, '%')
+           OR brand LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY asset_code
+        LIMIT 50
+    </select>
+
+    <insert id="insert" parameterType="org.uestc.weglas.base.dal.entity.EquipmentEntity">
+        INSERT INTO le_equipment (
+            id, asset_code, name, brand, model, serial_no, spec, quantity, unit, unit_price, book_value,
+            card_status, usage_status, room_id, location_raw, location_note, department, building, custodian,
+            purchase_date, scrap_date, supplier, manufacturer, is_abnormal, ext_info, created_at, updated_at
+        ) VALUES (
+            #{id}, #{assetCode}, #{name}, #{brand}, #{model}, #{serialNo}, #{spec}, #{quantity}, #{unit}, #{unitPrice}, #{bookValue},
+            #{cardStatus}, #{usageStatus}, #{roomId}, #{locationRaw}, #{locationNote}, #{department}, #{building}, #{custodian},
+            #{purchaseDate}, #{scrapDate}, #{supplier}, #{manufacturer}, #{isAbnormal}, #{extInfo}, #{createdAt}, #{updatedAt}
+        )
+    </insert>
+
+    <update id="updateById" parameterType="org.uestc.weglas.base.dal.entity.EquipmentEntity">
+        UPDATE le_equipment
+        SET name = #{name},
+            brand = #{brand},
+            model = #{model},
+            serial_no = #{serialNo},
+            spec = #{spec},
+            quantity = #{quantity},
+            unit = #{unit},
+            unit_price = #{unitPrice},
+            book_value = #{bookValue},
+            card_status = #{cardStatus},
+            usage_status = #{usageStatus},
+            room_id = #{roomId},
+            location_raw = #{locationRaw},
+            location_note = #{locationNote},
+            department = #{department},
+            building = #{building},
+            custodian = #{custodian},
+            purchase_date = #{purchaseDate},
+            scrap_date = #{scrapDate},
+            supplier = #{supplier},
+            manufacturer = #{manufacturer},
+            is_abnormal = #{isAbnormal},
+            ext_info = #{extInfo},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+</mapper>

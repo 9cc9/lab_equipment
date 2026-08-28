@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.uestc.weglas.base.dal.mapper.RoomMapper">
+
+    <insert id="insert" parameterType="org.uestc.weglas.base.dal.entity.RoomEntity">
+        INSERT INTO le_room (id, room_code, room_name, building, status, created_at, updated_at)
+        VALUES (#{id}, #{roomCode}, #{roomName}, #{building}, #{status}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="updateById" parameterType="org.uestc.weglas.base.dal.entity.RoomEntity">
+        UPDATE le_room
+        SET room_name = #{roomName},
+            building = #{building},
+            status = #{status},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+</mapper>

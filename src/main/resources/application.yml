@@ -1,0 +1,69 @@
+server:
+  port: 8085
+  address: 0.0.0.0
+  use-forward-headers: true
+
+logging:
+  config: classpath:log4j2-spring.xml
+
+spring:
+  thymeleaf:
+    enabled: false
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  resources:
+    static-locations: classpath:/static/
+  application:
+    name: lab_equipment
+  profiles:
+    active: dev
+  aop:
+    auto: true
+    proxy-target-class: true
+  redis:
+    host: localhost
+    timeout: 10000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+  cache:
+    type: redis
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/lab_equipment?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true&serverTimezone=GMT%2B8
+    username: root
+    password: Root@123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    initialization-mode: always
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+    schema:
+      - "classpath:db/schema.sql"
+      - "classpath:db/test_data.sql"
+
+app:
+  cors:
+    # 开发固定 Origin（局域网 https?://IP:5174 由 DevLanCorsFilter 正则额外放行）
+    allowed-origins: >-
+      http://localhost:5174,
+      http://127.0.0.1:5174,
+      https://localhost:5174,
+      https://127.0.0.1:5174
+    # 开发环境：允许局域网 IP:5174 跨域（含 https://192.168.x.x:5174）
+    # 使用 npm run dev:https 时，手机只访问 5174，API 经 Vite 代理到本机 8085，后端无需开 HTTPS
+    allow-private-network: true
+  session:
+    ttl-seconds: 259200
+    exclude-paths: /login.json
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:mappers/*.xml
+  type-aliases-package: org.uestc.weglas.base.dal.entity
