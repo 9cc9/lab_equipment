@@ -25,6 +25,9 @@ public interface EquipmentMapper {
 
     List<EquipmentEntity> search(@Param("keyword") String keyword);
 
+    @Select("SELECT * FROM le_equipment ORDER BY asset_code")
+    List<EquipmentEntity> selectAll();
+
     int insert(EquipmentEntity entity);
 
     int updateById(EquipmentEntity entity);

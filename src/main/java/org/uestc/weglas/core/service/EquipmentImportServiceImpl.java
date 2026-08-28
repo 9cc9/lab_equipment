@@ -9,12 +9,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.uestc.weglas.base.dal.entity.EquipmentEntity;
+import org.uestc.weglas.base.dal.entity.RoomEntity;
 import org.uestc.weglas.base.dal.mapper.EquipmentMapper;
+import org.uestc.weglas.base.dal.mapper.RoomMapper;
 import org.uestc.weglas.biz.dto.ImportResultDTO;
 import org.uestc.weglas.core.model.Room;
 import org.uestc.weglas.core.util.IdGenerator;
 import org.uestc.weglas.core.util.LocationParser;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.*;
@@ -24,8 +27,16 @@ public class EquipmentImportServiceImpl implements EquipmentImportService {
 
     private static final String SHEET_FULL = "完整表";
 
+    private static final String[] EXPORT_HEADERS = {
+            "编号", "名称", "品牌", "型号", "出厂号", "规格", "数量", "计量单位", "单价", "账面净值",
+            "卡片状态", "现状", "安置地点", "所属部门", "楼宇名称", "保管人", "购置日期", "预计报废时间", "供货商", "生产厂家"
+    };
+
     @Autowired
     private EquipmentMapper equipmentMapper;
+
+    @Autowired
+    private RoomMapper roomMapper;
 
     @Autowired
     private RoomService roomService;
@@ -77,6 +88,105 @@ public class EquipmentImportServiceImpl implements EquipmentImportService {
                 .roomCount(roomCodes.size())
                 .errors(errors.size() > 20 ? errors.subList(0, 20) : errors)
                 .build();
+    }
+
+    @Override
+    public byte[] exportToExcel() {
+        List<EquipmentEntity> equipmentList = equipmentMapper.selectAll();
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet(SHEET_FULL);
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < EXPORT_HEADERS.length; i++) {
+                headerRow.createCell(i).setCellValue(EXPORT_HEADERS[i]);
+            }
+
+            CellStyle dateStyle = workbook.createCellStyle();
+            dateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat("yyyy-mm-dd"));
+
+            int rowIndex = 1;
+            for (EquipmentEntity entity : equipmentList) {
+                writeExportRow(sheet.createRow(rowIndex++), entity, dateStyle);
+            }
+
+            for (int i = 0; i < EXPORT_HEADERS.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("导出 Excel 失败: " + e.getMessage(), e);
+        }
+    }
+
+    private void writeExportRow(Row row, EquipmentEntity entity, CellStyle dateStyle) {
+        setCellString(row, 0, entity.getAssetCode());
+        setCellString(row, 1, entity.getName());
+        setCellString(row, 2, entity.getBrand());
+        setCellString(row, 3, entity.getModel());
+        setCellString(row, 4, entity.getSerialNo());
+        setCellString(row, 5, entity.getSpec());
+        setCellDecimal(row, 6, entity.getQuantity());
+        setCellString(row, 7, entity.getUnit());
+        setCellDecimal(row, 8, entity.getUnitPrice());
+        setCellDecimal(row, 9, entity.getBookValue());
+        setCellString(row, 10, entity.getCardStatus());
+        setCellString(row, 11, entity.getUsageStatus());
+        setCellString(row, 12, resolveLocationForExport(entity));
+        setCellString(row, 13, entity.getDepartment());
+        setCellString(row, 14, entity.getBuilding());
+        setCellString(row, 15, entity.getCustodian());
+        setCellDate(row, 16, entity.getPurchaseDate(), dateStyle);
+        setCellDate(row, 17, entity.getScrapDate(), dateStyle);
+        setCellString(row, 18, entity.getSupplier());
+        setCellString(row, 19, entity.getManufacturer());
+    }
+
+    private String resolveLocationForExport(EquipmentEntity entity) {
+        String location = StringUtils.trimToNull(entity.getLocationRaw());
+        if (location == null && StringUtils.isNotBlank(entity.getRoomId())) {
+            RoomEntity room = roomMapper.selectById(entity.getRoomId());
+            if (room != null) {
+                location = room.getRoomCode();
+                if (StringUtils.isNotBlank(entity.getBuilding()) && location.matches("[AB]\\d{3}")) {
+                    location = entity.getBuilding() + location;
+                }
+            }
+        }
+        String note = StringUtils.trimToNull(entity.getLocationNote());
+        if (note != null && location != null && !location.contains(note)) {
+            if (!note.startsWith("（") && !note.startsWith("(")) {
+                note = "（" + note + "）";
+            }
+            location = location + note;
+        } else if (note != null) {
+            location = note;
+        }
+        return location;
+    }
+
+    private void setCellString(Row row, int columnIndex, String value) {
+        if (value == null) {
+            return;
+        }
+        row.createCell(columnIndex).setCellValue(value);
+    }
+
+    private void setCellDecimal(Row row, int columnIndex, BigDecimal value) {
+        if (value == null) {
+            return;
+        }
+        row.createCell(columnIndex).setCellValue(value.doubleValue());
+    }
+
+    private void setCellDate(Row row, int columnIndex, Date value, CellStyle dateStyle) {
+        if (value == null) {
+            return;
+        }
+        Cell cell = row.createCell(columnIndex);
+        cell.setCellValue(value);
+        cell.setCellStyle(dateStyle);
     }
 
     private void importRow(Row row, Map<String, Integer> headerIndex, Set<String> roomCodes) {

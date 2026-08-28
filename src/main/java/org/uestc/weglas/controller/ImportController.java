@@ -1,6 +1,7 @@
 package org.uestc.weglas.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +12,11 @@ import org.uestc.weglas.base.util.template.AbstractBizCallback;
 import org.uestc.weglas.base.util.template.BizTemplate;
 import org.uestc.weglas.biz.dto.ImportResultDTO;
 import org.uestc.weglas.core.service.EquipmentImportService;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @RestController
 public class ImportController {
@@ -32,5 +38,17 @@ public class ImportController {
                 result.setData(equipmentImportService.importFromExcel(file));
             }
         });
+    }
+
+    @GetMapping("/admin/export.json")
+    public void exportExcel(HttpServletResponse response) throws IOException {
+        byte[] data = equipmentImportService.exportToExcel();
+        String filename = "equipment-export-" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".xlsx";
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+        response.setContentLength(data.length);
+        response.getOutputStream().write(data);
+        response.flushBuffer();
     }
 }
