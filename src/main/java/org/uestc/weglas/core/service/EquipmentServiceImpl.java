@@ -200,7 +200,7 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     private void saveInspectionLog(EquipmentEntity entity, String operatorId, String operatorName,
                                    String source, String remark, Date now) {
-        insertChangeLog(entity, "验收", null, "完成设备验收", operatorId, operatorName, source, remark, now);
+        insertChangeLog(entity, "清查", null, "完成设备清查", operatorId, operatorName, source, remark, now);
     }
 
     private void insertChangeLog(EquipmentEntity entity, String fieldName, String oldValue, String newValue,
