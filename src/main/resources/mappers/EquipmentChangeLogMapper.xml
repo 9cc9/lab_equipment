@@ -5,10 +5,10 @@
     <insert id="insert" parameterType="org.uestc.weglas.base.dal.entity.EquipmentChangeLogEntity">
         INSERT INTO le_equipment_change_log (
             id, equipment_id, asset_code, field_name, old_value, new_value,
-            operator_id, operator_name, source, created_at
+            operator_id, operator_name, source, remark, created_at
         ) VALUES (
             #{id}, #{equipmentId}, #{assetCode}, #{fieldName}, #{oldValue}, #{newValue},
-            #{operatorId}, #{operatorName}, #{source}, #{createdAt}
+            #{operatorId}, #{operatorName}, #{source}, #{remark}, #{createdAt}
         )
     </insert>
 </mapper>

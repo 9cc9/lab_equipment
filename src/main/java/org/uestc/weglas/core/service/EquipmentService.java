@@ -1,5 +1,7 @@
 package org.uestc.weglas.core.service;
 
+import org.uestc.weglas.biz.dto.BatchUpdateEquipmentStatusRequest;
+import org.uestc.weglas.biz.dto.BatchUpdateResultDTO;
 import org.uestc.weglas.biz.dto.UpdateEquipmentStatusRequest;
 import org.uestc.weglas.core.model.Equipment;
 
@@ -17,4 +19,7 @@ public interface EquipmentService {
 
     Equipment updateStatus(String assetCode, UpdateEquipmentStatusRequest request,
                            String operatorId, String operatorName);
+
+    BatchUpdateResultDTO batchUpdateStatus(BatchUpdateEquipmentStatusRequest request,
+                                           String operatorId, String operatorName);
 }

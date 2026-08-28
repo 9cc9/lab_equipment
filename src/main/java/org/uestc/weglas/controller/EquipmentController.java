@@ -7,6 +7,8 @@ import org.uestc.weglas.base.util.BaseResult;
 import org.uestc.weglas.base.util.template.AbstractBizCallback;
 import org.uestc.weglas.base.util.template.BizTemplate;
 import org.uestc.weglas.base.util.validator.RequestValidator;
+import org.uestc.weglas.biz.dto.BatchUpdateEquipmentStatusRequest;
+import org.uestc.weglas.biz.dto.BatchUpdateResultDTO;
 import org.uestc.weglas.biz.dto.EquipmentChangeLogDTO;
 import org.uestc.weglas.biz.dto.EquipmentDTO;
 import org.uestc.weglas.biz.dto.UpdateEquipmentStatusRequest;
@@ -92,6 +94,27 @@ public class EquipmentController {
                 }
                 Equipment equipment = equipmentService.updateStatus(assetCode, request, operatorId, operatorName);
                 result.setData(EquipmentDTOConverter.toDTO(equipment));
+            }
+        });
+    }
+
+    @PostMapping("/equipment/batch-update-status.json")
+    public BaseResult<BatchUpdateResultDTO> batchUpdateStatus(@RequestBody BatchUpdateEquipmentStatusRequest request) {
+        return BizTemplate.execute(new AbstractBizCallback<BatchUpdateResultDTO>() {
+            @Override
+            public void checkParameter() {
+                RequestValidator.valid(request);
+            }
+
+            @Override
+            public void execute(BaseResult<BatchUpdateResultDTO> result) {
+                UserContext ctx = UserContextHolder.get();
+                String operatorId = ctx != null ? ctx.getUserId() : null;
+                String operatorName = ctx != null ? ctx.getName() : null;
+                if (StringUtils.isBlank(request.getSource())) {
+                    request.setSource("BATCH");
+                }
+                result.setData(equipmentService.batchUpdateStatus(request, operatorId, operatorName));
             }
         });
     }

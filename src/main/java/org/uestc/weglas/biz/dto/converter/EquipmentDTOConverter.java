@@ -73,6 +73,7 @@ public final class EquipmentDTOConverter {
                 .newValue(entity.getNewValue())
                 .operatorName(entity.getOperatorName())
                 .source(entity.getSource())
+                .remark(entity.getRemark())
                 .createdAt(entity.getCreatedAt())
                 .build();
     }

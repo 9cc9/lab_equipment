@@ -51,6 +51,7 @@ CREATE TABLE `le_equipment_change_log`
     `operator_id`  VARCHAR(64)  NULL,
     `operator_name` VARCHAR(64) NULL,
     `source`       VARCHAR(32)  NOT NULL DEFAULT 'SCAN',
+    `remark`       VARCHAR(512) NULL COMMENT '变更备注',
     `created_at`   DATETIME     NOT NULL,
     KEY `idx_equipment_id` (`equipment_id`),
     KEY `idx_asset_code` (`asset_code`)

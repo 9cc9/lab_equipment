@@ -2,6 +2,7 @@ package org.uestc.weglas.core.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.uestc.weglas.base.dal.entity.EquipmentChangeLogEntity;
@@ -11,6 +12,8 @@ import org.uestc.weglas.base.dal.mapper.EquipmentChangeLogMapper;
 import org.uestc.weglas.base.dal.mapper.EquipmentMapper;
 import org.uestc.weglas.base.dal.mapper.RoomMapper;
 import org.uestc.weglas.base.util.exception.AssertUtil;
+import org.uestc.weglas.biz.dto.BatchUpdateEquipmentStatusRequest;
+import org.uestc.weglas.biz.dto.BatchUpdateResultDTO;
 import org.uestc.weglas.biz.dto.UpdateEquipmentStatusRequest;
 import org.uestc.weglas.biz.dto.converter.EquipmentDTOConverter;
 import org.uestc.weglas.core.model.Equipment;
@@ -38,6 +41,10 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Autowired
     private IdGenerator idGenerator;
+
+    @Autowired
+    @Lazy
+    private EquipmentService equipmentService;
 
     @Override
     public Equipment queryByAssetCode(String assetCode) {
@@ -109,11 +116,50 @@ public class EquipmentServiceImpl implements EquipmentService {
         equipmentMapper.updateById(entity);
 
         String source = StringUtils.isBlank(request.getSource()) ? "SCAN" : request.getSource();
-        saveChangeLog(entity, "usageStatus", oldUsageStatus, request.getUsageStatus(), operatorId, operatorName, source, now);
-        saveChangeLog(entity, "roomCode", oldRoomCode, room.getRoomCode(), operatorId, operatorName, source, now);
-        saveInspectionLog(entity, operatorId, operatorName, source, now);
+        String remark = StringUtils.trimToNull(request.getRemark());
+        saveChangeLog(entity, "usageStatus", oldUsageStatus, request.getUsageStatus(), operatorId, operatorName, source, remark, now);
+        saveChangeLog(entity, "roomCode", oldRoomCode, room.getRoomCode(), operatorId, operatorName, source, remark, now);
+        saveInspectionLog(entity, operatorId, operatorName, source, remark, now);
 
         return toEquipment(entity, toRoomEntity(room));
+    }
+
+    @Override
+    public BatchUpdateResultDTO batchUpdateStatus(BatchUpdateEquipmentStatusRequest request,
+                                                  String operatorId, String operatorName) {
+        AssertUtil.notNull(request.getAssetCodes(), "请选择设备");
+
+        List<String> codes = new ArrayList<>();
+        for (String assetCode : request.getAssetCodes()) {
+            if (StringUtils.isNotBlank(assetCode)) {
+                codes.add(assetCode.trim());
+            }
+        }
+        AssertUtil.isTrue(!codes.isEmpty(), "请选择设备");
+
+        UpdateEquipmentStatusRequest single = new UpdateEquipmentStatusRequest();
+        single.setUsageStatus(request.getUsageStatus());
+        single.setRoomCode(request.getRoomCode());
+        single.setRemark(request.getRemark());
+        single.setSource(StringUtils.isBlank(request.getSource()) ? "BATCH" : request.getSource());
+
+        int success = 0;
+        List<String> errors = new ArrayList<>();
+        for (String code : codes) {
+            try {
+                equipmentService.updateStatus(code, single, operatorId, operatorName);
+                success++;
+            } catch (Exception e) {
+                errors.add(code + ": " + e.getMessage());
+            }
+        }
+        int total = codes.size();
+        return BatchUpdateResultDTO.builder()
+                .totalCount(total)
+                .successCount(success)
+                .failCount(total - success)
+                .errors(errors.size() > 20 ? errors.subList(0, 20) : errors)
+                .build();
     }
 
     private Equipment toEquipment(EquipmentEntity entity) {
@@ -145,20 +191,20 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     private void saveChangeLog(EquipmentEntity entity, String fieldName, String oldValue, String newValue,
-                               String operatorId, String operatorName, String source, Date now) {
+                               String operatorId, String operatorName, String source, String remark, Date now) {
         if (StringUtils.equals(StringUtils.defaultString(oldValue), StringUtils.defaultString(newValue))) {
             return;
         }
-        insertChangeLog(entity, fieldName, oldValue, newValue, operatorId, operatorName, source, now);
+        insertChangeLog(entity, fieldName, oldValue, newValue, operatorId, operatorName, source, remark, now);
     }
 
     private void saveInspectionLog(EquipmentEntity entity, String operatorId, String operatorName,
-                                   String source, Date now) {
-        insertChangeLog(entity, "验收", null, "完成设备验收", operatorId, operatorName, source, now);
+                                   String source, String remark, Date now) {
+        insertChangeLog(entity, "验收", null, "完成设备验收", operatorId, operatorName, source, remark, now);
     }
 
     private void insertChangeLog(EquipmentEntity entity, String fieldName, String oldValue, String newValue,
-                                   String operatorId, String operatorName, String source, Date now) {
+                                   String operatorId, String operatorName, String source, String remark, Date now) {
         EquipmentChangeLogEntity log = new EquipmentChangeLogEntity();
         log.setId(idGenerator.generate(IdGenerator.EntityType.CHANGE_LOG));
         log.setEquipmentId(entity.getId());
@@ -169,6 +215,7 @@ public class EquipmentServiceImpl implements EquipmentService {
         log.setOperatorId(operatorId);
         log.setOperatorName(operatorName);
         log.setSource(source);
+        log.setRemark(remark);
         log.setCreatedAt(now);
         changeLogMapper.insert(log);
     }

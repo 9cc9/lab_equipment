@@ -15,5 +15,6 @@ public class EquipmentChangeLogEntity {
     private String operatorId;
     private String operatorName;
     private String source;
+    private String remark;
     private Date createdAt;
 }

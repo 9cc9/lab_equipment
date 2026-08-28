@@ -15,5 +15,6 @@ public class EquipmentChangeLogDTO {
     private String newValue;
     private String operatorName;
     private String source;
+    private String remark;
     private Date createdAt;
 }
