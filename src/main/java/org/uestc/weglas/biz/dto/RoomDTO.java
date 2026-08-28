@@ -13,4 +13,5 @@ public class RoomDTO {
     private String roomName;
     private String building;
     private Integer equipmentCount;
+    private Integer lostEquipmentCount;
 }

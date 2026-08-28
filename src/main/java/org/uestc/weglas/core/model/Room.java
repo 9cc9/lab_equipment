@@ -11,4 +11,5 @@ public class Room {
     private String roomName;
     private String building;
     private Integer equipmentCount;
+    private Integer lostEquipmentCount;
 }

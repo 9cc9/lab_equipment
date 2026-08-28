@@ -58,6 +58,7 @@ public final class EquipmentDTOConverter {
                 .roomName(room.getRoomName())
                 .building(room.getBuilding())
                 .equipmentCount(room.getEquipmentCount())
+                .lostEquipmentCount(room.getLostEquipmentCount())
                 .build();
     }
 

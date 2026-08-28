@@ -34,6 +34,7 @@ public class RoomServiceImpl implements RoomService {
                     .roomName(StringUtils.isNotBlank(entity.getRoomName()) ? entity.getRoomName() : entity.getRoomCode())
                     .building(entity.getBuilding())
                     .equipmentCount(equipmentMapper.countByRoomId(entity.getId()))
+                    .lostEquipmentCount(equipmentMapper.countByRoomIdAndUsageStatus(entity.getId(), "已遗失"))
                     .build());
         }
         return rooms;

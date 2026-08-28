@@ -31,4 +31,7 @@ public interface EquipmentMapper {
 
     @Select("SELECT COUNT(1) FROM le_equipment WHERE room_id = #{roomId}")
     int countByRoomId(@Param("roomId") String roomId);
+
+    @Select("SELECT COUNT(1) FROM le_equipment WHERE room_id = #{roomId} AND usage_status = #{usageStatus}")
+    int countByRoomIdAndUsageStatus(@Param("roomId") String roomId, @Param("usageStatus") String usageStatus);
 }
