@@ -1,5 +1,6 @@
 package org.uestc.weglas.core.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.uestc.weglas.base.dal.entity.EquipmentChangeLogEntity;
@@ -28,13 +29,15 @@ public class EquipmentChangeLogServiceImpl implements EquipmentChangeLogService 
     }
 
     @Override
-    public PageResultDTO<EquipmentChangeLogDTO> pageRoomAndStatusChanges(int page, int pageSize) {
+    public PageResultDTO<EquipmentChangeLogDTO> pageRoomAndStatusChanges(int page, int pageSize, String fieldName) {
         int safePage = Math.max(page, 1);
         int safePageSize = Math.min(Math.max(pageSize, 1), 100);
         int offset = (safePage - 1) * safePageSize;
+        String safeFieldName = normalizeFieldName(fieldName);
 
-        long total = changeLogMapper.countRoomAndStatusChanges();
-        List<EquipmentChangeLogEntity> entities = changeLogMapper.selectRoomAndStatusChanges(offset, safePageSize);
+        long total = changeLogMapper.countRoomAndStatusChanges(safeFieldName);
+        List<EquipmentChangeLogEntity> entities = changeLogMapper.selectRoomAndStatusChanges(
+                safeFieldName, offset, safePageSize);
         List<EquipmentChangeLogDTO> list = new ArrayList<>();
         for (EquipmentChangeLogEntity entity : entities) {
             list.add(EquipmentDTOConverter.toDTO(entity));
@@ -45,5 +48,15 @@ public class EquipmentChangeLogServiceImpl implements EquipmentChangeLogService 
                 .page(safePage)
                 .pageSize(safePageSize)
                 .build();
+    }
+
+    private String normalizeFieldName(String fieldName) {
+        if (StringUtils.isBlank(fieldName)) {
+            return null;
+        }
+        if ("usageStatus".equals(fieldName) || "roomCode".equals(fieldName)) {
+            return fieldName;
+        }
+        return null;
     }
 }

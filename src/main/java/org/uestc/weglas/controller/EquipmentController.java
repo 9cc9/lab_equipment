@@ -123,11 +123,12 @@ public class EquipmentController {
     @GetMapping("/equipment/change-logs.json")
     public BaseResult<PageResultDTO<EquipmentChangeLogDTO>> pageChangeLogs(
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize) {
+            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize,
+            @RequestParam(value = "fieldName", required = false) String fieldName) {
         return BizTemplate.execute(new AbstractBizCallback<PageResultDTO<EquipmentChangeLogDTO>>() {
             @Override
             public void execute(BaseResult<PageResultDTO<EquipmentChangeLogDTO>> result) {
-                result.setData(changeLogService.pageRoomAndStatusChanges(page, pageSize));
+                result.setData(changeLogService.pageRoomAndStatusChanges(page, pageSize, fieldName));
             }
         });
     }

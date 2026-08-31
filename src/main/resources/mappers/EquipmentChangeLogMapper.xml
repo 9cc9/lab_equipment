@@ -12,16 +12,23 @@
         )
     </insert>
 
+    <sql id="roomAndStatusChangeWhere">
+        WHERE field_name IN ('usageStatus', 'roomCode')
+        <if test="fieldName != null and fieldName != ''">
+            AND field_name = #{fieldName}
+        </if>
+    </sql>
+
     <select id="countRoomAndStatusChanges" resultType="long">
         SELECT COUNT(*)
         FROM le_equipment_change_log
-        WHERE field_name IN ('usageStatus', 'roomCode')
+        <include refid="roomAndStatusChangeWhere"/>
     </select>
 
     <select id="selectRoomAndStatusChanges" resultType="org.uestc.weglas.base.dal.entity.EquipmentChangeLogEntity">
         SELECT *
         FROM le_equipment_change_log
-        WHERE field_name IN ('usageStatus', 'roomCode')
+        <include refid="roomAndStatusChangeWhere"/>
         ORDER BY created_at DESC
         LIMIT #{offset}, #{pageSize}
     </select>

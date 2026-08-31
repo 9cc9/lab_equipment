@@ -8,5 +8,5 @@ import java.util.List;
 public interface EquipmentChangeLogService {
     List<EquipmentChangeLogDTO> listByEquipmentId(String equipmentId, int limit);
 
-    PageResultDTO<EquipmentChangeLogDTO> pageRoomAndStatusChanges(int page, int pageSize);
+    PageResultDTO<EquipmentChangeLogDTO> pageRoomAndStatusChanges(int page, int pageSize, String fieldName);
 }

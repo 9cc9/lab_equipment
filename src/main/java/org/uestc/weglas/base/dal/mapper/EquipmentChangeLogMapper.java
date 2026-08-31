@@ -18,8 +18,9 @@ public interface EquipmentChangeLogMapper {
     List<EquipmentChangeLogEntity> selectByEquipmentId(@Param("equipmentId") String equipmentId,
                                                        @Param("limit") int limit);
 
-    long countRoomAndStatusChanges();
+    long countRoomAndStatusChanges(@Param("fieldName") String fieldName);
 
-    List<EquipmentChangeLogEntity> selectRoomAndStatusChanges(@Param("offset") int offset,
+    List<EquipmentChangeLogEntity> selectRoomAndStatusChanges(@Param("fieldName") String fieldName,
+                                                              @Param("offset") int offset,
                                                               @Param("pageSize") int pageSize);
 }
