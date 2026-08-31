@@ -17,4 +17,9 @@ public interface EquipmentChangeLogMapper {
     @Select("SELECT * FROM le_equipment_change_log WHERE equipment_id = #{equipmentId} ORDER BY created_at DESC LIMIT #{limit}")
     List<EquipmentChangeLogEntity> selectByEquipmentId(@Param("equipmentId") String equipmentId,
                                                        @Param("limit") int limit);
+
+    long countRoomAndStatusChanges();
+
+    List<EquipmentChangeLogEntity> selectRoomAndStatusChanges(@Param("offset") int offset,
+                                                              @Param("pageSize") int pageSize);
 }

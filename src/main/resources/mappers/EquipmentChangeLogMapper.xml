@@ -11,4 +11,18 @@
             #{operatorId}, #{operatorName}, #{source}, #{remark}, #{createdAt}
         )
     </insert>
+
+    <select id="countRoomAndStatusChanges" resultType="long">
+        SELECT COUNT(*)
+        FROM le_equipment_change_log
+        WHERE field_name IN ('usageStatus', 'roomCode')
+    </select>
+
+    <select id="selectRoomAndStatusChanges" resultType="org.uestc.weglas.base.dal.entity.EquipmentChangeLogEntity">
+        SELECT *
+        FROM le_equipment_change_log
+        WHERE field_name IN ('usageStatus', 'roomCode')
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
 </mapper>

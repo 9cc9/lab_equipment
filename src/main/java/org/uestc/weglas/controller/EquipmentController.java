@@ -11,6 +11,7 @@ import org.uestc.weglas.biz.dto.BatchUpdateEquipmentStatusRequest;
 import org.uestc.weglas.biz.dto.BatchUpdateResultDTO;
 import org.uestc.weglas.biz.dto.EquipmentChangeLogDTO;
 import org.uestc.weglas.biz.dto.EquipmentDTO;
+import org.uestc.weglas.biz.dto.PageResultDTO;
 import org.uestc.weglas.biz.dto.UpdateEquipmentStatusRequest;
 import org.uestc.weglas.biz.dto.converter.EquipmentDTOConverter;
 import org.uestc.weglas.core.model.Equipment;
@@ -115,6 +116,18 @@ public class EquipmentController {
                     request.setSource("BATCH");
                 }
                 result.setData(equipmentService.batchUpdateStatus(request, operatorId, operatorName));
+            }
+        });
+    }
+
+    @GetMapping("/equipment/change-logs.json")
+    public BaseResult<PageResultDTO<EquipmentChangeLogDTO>> pageChangeLogs(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize) {
+        return BizTemplate.execute(new AbstractBizCallback<PageResultDTO<EquipmentChangeLogDTO>>() {
+            @Override
+            public void execute(BaseResult<PageResultDTO<EquipmentChangeLogDTO>> result) {
+                result.setData(changeLogService.pageRoomAndStatusChanges(page, pageSize));
             }
         });
     }
