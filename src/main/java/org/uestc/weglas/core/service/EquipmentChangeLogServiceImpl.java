@@ -54,7 +54,7 @@ public class EquipmentChangeLogServiceImpl implements EquipmentChangeLogService 
         if (StringUtils.isBlank(fieldName)) {
             return null;
         }
-        if ("usageStatus".equals(fieldName) || "roomCode".equals(fieldName)) {
+        if ("usageStatus".equals(fieldName) || "roomCode".equals(fieldName) || "status".equals(fieldName)) {
             return fieldName;
         }
         return null;

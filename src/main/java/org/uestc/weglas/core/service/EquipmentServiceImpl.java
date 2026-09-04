@@ -12,13 +12,16 @@ import org.uestc.weglas.base.dal.mapper.EquipmentChangeLogMapper;
 import org.uestc.weglas.base.dal.mapper.EquipmentMapper;
 import org.uestc.weglas.base.dal.mapper.RoomMapper;
 import org.uestc.weglas.base.util.exception.AssertUtil;
+import org.uestc.weglas.biz.dto.BatchDeleteEquipmentRequest;
 import org.uestc.weglas.biz.dto.BatchUpdateEquipmentStatusRequest;
 import org.uestc.weglas.biz.dto.BatchUpdateResultDTO;
 import org.uestc.weglas.biz.dto.UpdateEquipmentStatusRequest;
 import org.uestc.weglas.biz.dto.converter.EquipmentDTOConverter;
+import org.uestc.weglas.core.enums.Status;
 import org.uestc.weglas.core.model.Equipment;
 import org.uestc.weglas.core.model.Room;
 import org.uestc.weglas.core.util.IdGenerator;
+import org.uestc.weglas.core.util.UserContextHolder;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,6 +29,8 @@ import java.util.List;
 
 @Service
 public class EquipmentServiceImpl implements EquipmentService {
+
+    private static final String NOT_FOUND_MESSAGE = "未找到该设备";
 
     @Autowired
     private EquipmentMapper equipmentMapper;
@@ -49,15 +54,15 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     public Equipment queryByAssetCode(String assetCode) {
         AssertUtil.notBlank(assetCode, "设备编号不能为空");
-        EquipmentEntity entity = equipmentMapper.selectByAssetCode(assetCode.trim());
-        AssertUtil.notNull(entity, "未找到该设备");
+        EquipmentEntity entity = requireEnabledByAssetCode(assetCode.trim());
         return toEquipment(entity);
     }
 
     @Override
     public Equipment queryById(String id) {
         EquipmentEntity entity = equipmentMapper.selectById(id);
-        AssertUtil.notNull(entity, "未找到该设备");
+        AssertUtil.notNull(entity, NOT_FOUND_MESSAGE);
+        assertEnabled(entity);
         return toEquipment(entity);
     }
 
@@ -95,8 +100,7 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Transactional(rollbackFor = Exception.class)
     public Equipment updateStatus(String assetCode, UpdateEquipmentStatusRequest request,
                                   String operatorId, String operatorName) {
-        EquipmentEntity entity = equipmentMapper.selectByAssetCode(assetCode.trim());
-        AssertUtil.notNull(entity, "未找到该设备");
+        EquipmentEntity entity = requireEnabledByAssetCode(assetCode.trim());
 
         Room room = roomService.getOrCreateByRoomCode(request.getRoomCode(), entity.getBuilding());
         AssertUtil.notNull(room, "房间无效");
@@ -111,6 +115,9 @@ public class EquipmentServiceImpl implements EquipmentService {
         entity.setLocationRaw(room.getRoomCode());
         if (StringUtils.isNotBlank(request.getRemark())) {
             entity.setLocationNote(request.getRemark());
+        }
+        if (StringUtils.isBlank(entity.getStatus())) {
+            entity.setStatus(Status.ENABLED.getCode());
         }
         entity.setUpdatedAt(now);
         equipmentMapper.updateById(entity);
@@ -160,6 +167,83 @@ public class EquipmentServiceImpl implements EquipmentService {
                 .failCount(total - success)
                 .errors(errors.size() > 20 ? errors.subList(0, 20) : errors)
                 .build();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Equipment delete(String assetCode, String remark, String source,
+                            String operatorId, String operatorName) {
+        assertAdmin();
+        AssertUtil.notBlank(assetCode, "设备编号不能为空");
+
+        EquipmentEntity entity = equipmentMapper.selectByAssetCode(assetCode.trim());
+        AssertUtil.notNull(entity, NOT_FOUND_MESSAGE);
+        AssertUtil.isTrue(!isDeleted(entity), "设备已删除");
+
+        String oldStatus = entity.getStatus();
+        Date now = new Date();
+        entity.setStatus(Status.DELETED.getCode());
+        entity.setUpdatedAt(now);
+        equipmentMapper.updateById(entity);
+
+        String logSource = StringUtils.isBlank(source) ? "DELETE" : source;
+        saveChangeLog(entity, "status", oldStatus, Status.DELETED.getCode(),
+                operatorId, operatorName, logSource, StringUtils.trimToNull(remark), now);
+        return toEquipment(entity);
+    }
+
+    @Override
+    public BatchUpdateResultDTO batchDelete(BatchDeleteEquipmentRequest request,
+                                            String operatorId, String operatorName) {
+        assertAdmin();
+        AssertUtil.notNull(request.getAssetCodes(), "请选择设备");
+
+        List<String> codes = new ArrayList<>();
+        for (String assetCode : request.getAssetCodes()) {
+            if (StringUtils.isNotBlank(assetCode)) {
+                codes.add(assetCode.trim());
+            }
+        }
+        AssertUtil.isTrue(!codes.isEmpty(), "请选择设备");
+
+        String remark = request.getRemark();
+        int success = 0;
+        List<String> errors = new ArrayList<>();
+        for (String code : codes) {
+            try {
+                equipmentService.delete(code, remark, "BATCH_DELETE", operatorId, operatorName);
+                success++;
+            } catch (Exception e) {
+                errors.add(code + ": " + e.getMessage());
+            }
+        }
+        int total = codes.size();
+        return BatchUpdateResultDTO.builder()
+                .totalCount(total)
+                .successCount(success)
+                .failCount(total - success)
+                .errors(errors.size() > 20 ? errors.subList(0, 20) : errors)
+                .build();
+    }
+
+    private EquipmentEntity requireEnabledByAssetCode(String assetCode) {
+        EquipmentEntity entity = equipmentMapper.selectByAssetCode(assetCode);
+        AssertUtil.notNull(entity, NOT_FOUND_MESSAGE);
+        assertEnabled(entity);
+        return entity;
+    }
+
+    private void assertEnabled(EquipmentEntity entity) {
+        AssertUtil.isTrue(!isDeleted(entity), NOT_FOUND_MESSAGE);
+    }
+
+    private boolean isDeleted(EquipmentEntity entity) {
+        Status status = Status.fromCode(entity.getStatus());
+        return status != null && status.isDeleted();
+    }
+
+    private void assertAdmin() {
+        AssertUtil.isTrue(UserContextHolder.isAdmin(), "仅管理员可删除设备");
     }
 
     private Equipment toEquipment(EquipmentEntity entity) {

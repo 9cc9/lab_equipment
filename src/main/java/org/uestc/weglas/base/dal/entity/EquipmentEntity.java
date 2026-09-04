@@ -20,6 +20,7 @@ public class EquipmentEntity {
     private BigDecimal bookValue;
     private String cardStatus;
     private String usageStatus;
+    private String status;
     private String roomId;
     private String locationRaw;
     private String locationNote;

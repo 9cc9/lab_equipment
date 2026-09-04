@@ -1,5 +1,6 @@
 package org.uestc.weglas.core.service;
 
+import org.uestc.weglas.biz.dto.BatchDeleteEquipmentRequest;
 import org.uestc.weglas.biz.dto.BatchUpdateEquipmentStatusRequest;
 import org.uestc.weglas.biz.dto.BatchUpdateResultDTO;
 import org.uestc.weglas.biz.dto.UpdateEquipmentStatusRequest;
@@ -22,4 +23,10 @@ public interface EquipmentService {
 
     BatchUpdateResultDTO batchUpdateStatus(BatchUpdateEquipmentStatusRequest request,
                                            String operatorId, String operatorName);
+
+    Equipment delete(String assetCode, String remark, String source,
+                     String operatorId, String operatorName);
+
+    BatchUpdateResultDTO batchDelete(BatchDeleteEquipmentRequest request,
+                                     String operatorId, String operatorName);
 }

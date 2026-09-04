@@ -9,4 +9,6 @@ public class UserDTO {
     private String id;
     private String username;
     private String name;
+    /** ADMIN 管理员，ASSISTANT 学生助管 */
+    private String userType;
 }

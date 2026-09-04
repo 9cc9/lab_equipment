@@ -73,6 +73,7 @@ CREATE TABLE `le_equipment`
     `book_value`       DECIMAL(14, 2) NULL,
     `card_status`      VARCHAR(32)    NULL COMMENT '卡片状态',
     `usage_status`     VARCHAR(32)    NULL COMMENT '现状',
+    `status`           VARCHAR(32)    NOT NULL DEFAULT 'ENABLED' COMMENT 'ENABLED/DELETED',
     `room_id`          VARCHAR(64)    NULL,
     `location_raw`     VARCHAR(256)   NULL COMMENT '原始安置地点',
     `location_note`    VARCHAR(256)   NULL COMMENT '安置地点备注',
@@ -89,5 +90,6 @@ CREATE TABLE `le_equipment`
     `updated_at`       DATETIME       NOT NULL,
     UNIQUE KEY `uk_asset_code` (`asset_code`),
     KEY `idx_room_id` (`room_id`),
-    KEY `idx_usage_status` (`usage_status`)
+    KEY `idx_usage_status` (`usage_status`),
+    KEY `idx_status` (`status`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='高值设备';

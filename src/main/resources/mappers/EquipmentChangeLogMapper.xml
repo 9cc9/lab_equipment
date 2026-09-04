@@ -13,7 +13,7 @@
     </insert>
 
     <sql id="roomAndStatusChangeWhere">
-        WHERE field_name IN ('usageStatus', 'roomCode')
+        WHERE field_name IN ('usageStatus', 'roomCode', 'status')
         <if test="fieldName != null and fieldName != ''">
             AND field_name = #{fieldName}
         </if>

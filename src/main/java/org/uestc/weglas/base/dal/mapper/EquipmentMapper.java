@@ -25,16 +25,16 @@ public interface EquipmentMapper {
 
     List<EquipmentEntity> search(@Param("keyword") String keyword);
 
-    @Select("SELECT * FROM le_equipment ORDER BY asset_code")
+    @Select("SELECT * FROM le_equipment WHERE status = 'ENABLED' ORDER BY asset_code")
     List<EquipmentEntity> selectAll();
 
     int insert(EquipmentEntity entity);
 
     int updateById(EquipmentEntity entity);
 
-    @Select("SELECT COUNT(1) FROM le_equipment WHERE room_id = #{roomId}")
+    @Select("SELECT COUNT(1) FROM le_equipment WHERE room_id = #{roomId} AND status = 'ENABLED'")
     int countByRoomId(@Param("roomId") String roomId);
 
-    @Select("SELECT COUNT(1) FROM le_equipment WHERE room_id = #{roomId} AND usage_status = #{usageStatus}")
+    @Select("SELECT COUNT(1) FROM le_equipment WHERE room_id = #{roomId} AND usage_status = #{usageStatus} AND status = 'ENABLED'")
     int countByRoomIdAndUsageStatus(@Param("roomId") String roomId, @Param("usageStatus") String usageStatus);
 }

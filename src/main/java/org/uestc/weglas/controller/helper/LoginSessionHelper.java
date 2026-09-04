@@ -46,6 +46,7 @@ public final class LoginSessionHelper {
                 .id(user.getId())
                 .username(user.getUsername())
                 .name(user.getName())
+                .userType(userContext.getUserType())
                 .build();
 
         return LoginResponse.builder()

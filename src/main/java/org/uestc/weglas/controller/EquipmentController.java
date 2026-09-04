@@ -7,8 +7,10 @@ import org.uestc.weglas.base.util.BaseResult;
 import org.uestc.weglas.base.util.template.AbstractBizCallback;
 import org.uestc.weglas.base.util.template.BizTemplate;
 import org.uestc.weglas.base.util.validator.RequestValidator;
+import org.uestc.weglas.biz.dto.BatchDeleteEquipmentRequest;
 import org.uestc.weglas.biz.dto.BatchUpdateEquipmentStatusRequest;
 import org.uestc.weglas.biz.dto.BatchUpdateResultDTO;
+import org.uestc.weglas.biz.dto.DeleteEquipmentRequest;
 import org.uestc.weglas.biz.dto.EquipmentChangeLogDTO;
 import org.uestc.weglas.biz.dto.EquipmentDTO;
 import org.uestc.weglas.biz.dto.PageResultDTO;
@@ -116,6 +118,40 @@ public class EquipmentController {
                     request.setSource("BATCH");
                 }
                 result.setData(equipmentService.batchUpdateStatus(request, operatorId, operatorName));
+            }
+        });
+    }
+
+    @PostMapping("/equipment/by-code/{assetCode}/delete.json")
+    public BaseResult<EquipmentDTO> delete(@PathVariable("assetCode") String assetCode,
+                                           @RequestBody(required = false) DeleteEquipmentRequest request) {
+        return BizTemplate.execute(new AbstractBizCallback<EquipmentDTO>() {
+            @Override
+            public void execute(BaseResult<EquipmentDTO> result) {
+                UserContext ctx = UserContextHolder.get();
+                String operatorId = ctx != null ? ctx.getUserId() : null;
+                String operatorName = ctx != null ? ctx.getName() : null;
+                String remark = request != null ? request.getRemark() : null;
+                Equipment equipment = equipmentService.delete(assetCode, remark, "DELETE", operatorId, operatorName);
+                result.setData(EquipmentDTOConverter.toDTO(equipment));
+            }
+        });
+    }
+
+    @PostMapping("/equipment/batch-delete.json")
+    public BaseResult<BatchUpdateResultDTO> batchDelete(@RequestBody BatchDeleteEquipmentRequest request) {
+        return BizTemplate.execute(new AbstractBizCallback<BatchUpdateResultDTO>() {
+            @Override
+            public void checkParameter() {
+                RequestValidator.valid(request);
+            }
+
+            @Override
+            public void execute(BaseResult<BatchUpdateResultDTO> result) {
+                UserContext ctx = UserContextHolder.get();
+                String operatorId = ctx != null ? ctx.getUserId() : null;
+                String operatorName = ctx != null ? ctx.getName() : null;
+                result.setData(equipmentService.batchDelete(request, operatorId, operatorName));
             }
         });
     }

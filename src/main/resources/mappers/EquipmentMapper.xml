@@ -5,6 +5,7 @@
     <select id="selectByRoomId" resultType="org.uestc.weglas.base.dal.entity.EquipmentEntity">
         SELECT * FROM le_equipment
         WHERE room_id = #{roomId}
+          AND status = 'ENABLED'
         <if test="keyword != null and keyword != ''">
             AND (asset_code LIKE CONCAT('%', #{keyword}, '%')
             OR name LIKE CONCAT('%', #{keyword}, '%')
@@ -25,9 +26,10 @@
 
     <select id="search" resultType="org.uestc.weglas.base.dal.entity.EquipmentEntity">
         SELECT * FROM le_equipment
-        WHERE asset_code LIKE CONCAT('%', #{keyword}, '%')
+        WHERE status = 'ENABLED'
+          AND (asset_code LIKE CONCAT('%', #{keyword}, '%')
            OR name LIKE CONCAT('%', #{keyword}, '%')
-           OR brand LIKE CONCAT('%', #{keyword}, '%')
+           OR brand LIKE CONCAT('%', #{keyword}, '%'))
         ORDER BY asset_code
         LIMIT 50
     </select>
@@ -35,11 +37,11 @@
     <insert id="insert" parameterType="org.uestc.weglas.base.dal.entity.EquipmentEntity">
         INSERT INTO le_equipment (
             id, asset_code, name, brand, model, serial_no, spec, quantity, unit, unit_price, book_value,
-            card_status, usage_status, room_id, location_raw, location_note, department, building, custodian,
+            card_status, usage_status, status, room_id, location_raw, location_note, department, building, custodian,
             purchase_date, scrap_date, supplier, manufacturer, is_abnormal, ext_info, created_at, updated_at
         ) VALUES (
             #{id}, #{assetCode}, #{name}, #{brand}, #{model}, #{serialNo}, #{spec}, #{quantity}, #{unit}, #{unitPrice}, #{bookValue},
-            #{cardStatus}, #{usageStatus}, #{roomId}, #{locationRaw}, #{locationNote}, #{department}, #{building}, #{custodian},
+            #{cardStatus}, #{usageStatus}, #{status}, #{roomId}, #{locationRaw}, #{locationNote}, #{department}, #{building}, #{custodian},
             #{purchaseDate}, #{scrapDate}, #{supplier}, #{manufacturer}, #{isAbnormal}, #{extInfo}, #{createdAt}, #{updatedAt}
         )
     </insert>
@@ -57,6 +59,7 @@
             book_value = #{bookValue},
             card_status = #{cardStatus},
             usage_status = #{usageStatus},
+            status = #{status},
             room_id = #{roomId},
             location_raw = #{locationRaw},
             location_note = #{locationNote},

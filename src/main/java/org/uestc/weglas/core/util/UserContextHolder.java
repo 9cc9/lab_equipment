@@ -71,6 +71,14 @@ public class UserContextHolder {
     }
 
     /**
+     * 当前用户是否为管理员
+     */
+    public static boolean isAdmin() {
+        UserContext context = CONTEXT_HOLDER.get();
+        return context != null && "ADMIN".equals(context.getUserType());
+    }
+
+    /**
      * 清除用户上下文
      * 必须在请求结束时调用，避免内存泄漏
      */

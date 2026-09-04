@@ -13,6 +13,7 @@ import org.uestc.weglas.base.dal.entity.RoomEntity;
 import org.uestc.weglas.base.dal.mapper.EquipmentMapper;
 import org.uestc.weglas.base.dal.mapper.RoomMapper;
 import org.uestc.weglas.biz.dto.ImportResultDTO;
+import org.uestc.weglas.core.enums.Status;
 import org.uestc.weglas.core.model.Room;
 import org.uestc.weglas.core.util.IdGenerator;
 import org.uestc.weglas.core.util.LocationParser;
@@ -227,6 +228,7 @@ public class EquipmentImportServiceImpl implements EquipmentImportService {
         entity.setBookValue(parseDecimal(getCellString(row, headerIndex.get("账面净值"))));
         entity.setCardStatus(getCellString(row, headerIndex.get("卡片状态")));
         entity.setUsageStatus(getCellString(row, headerIndex.get("现状")));
+        entity.setStatus(Status.ENABLED.getCode());
         entity.setRoomId(room != null ? room.getId() : null);
         entity.setLocationRaw(parsed.getRaw());
         entity.setLocationNote(parsed.getNote());
