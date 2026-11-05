@@ -71,7 +71,8 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public List<Equipment> listByRoomCode(String roomCode, String keyword, String usageStatus, String sortOrder) {
+    public List<Equipment> listByRoomCode(String roomCode, String keyword, String usageStatus, String sortOrder,
+                                          String borrowType) {
         AssertUtil.notBlank(roomCode, "房间编号不能为空");
         RoomEntity room = roomMapper.selectByRoomCode(roomCode.trim());
         if (room == null) {
@@ -79,7 +80,9 @@ public class EquipmentServiceImpl implements EquipmentService {
         }
         String order = "asc".equalsIgnoreCase(sortOrder) ? "asc" : "desc";
         String statusFilter = StringUtils.isBlank(usageStatus) ? null : usageStatus.trim();
-        List<EquipmentEntity> entities = equipmentMapper.selectByRoomId(room.getId(), keyword, statusFilter, order);
+        String borrowTypeFilter = normalizeBorrowTypeFilter(borrowType);
+        List<EquipmentEntity> entities = equipmentMapper.selectByRoomId(
+                room.getId(), keyword, statusFilter, order, borrowTypeFilter);
         List<Equipment> result = new ArrayList<>();
         for (EquipmentEntity entity : entities) {
             result.add(toEquipment(entity, room));
@@ -277,6 +280,21 @@ public class EquipmentServiceImpl implements EquipmentService {
         }
         RoomEntity room = roomMapper.selectById(roomId);
         return room != null ? room.getRoomCode() : null;
+    }
+
+    /** OFF = 未开放借用；ALL/EXTERNAL/IN_LAB = 已开放且允许类型匹配 */
+    private String normalizeBorrowTypeFilter(String borrowType) {
+        if (StringUtils.isBlank(borrowType)) {
+            return null;
+        }
+        String t = borrowType.trim().toUpperCase();
+        if ("OFF".equals(t)) {
+            return "OFF";
+        }
+        if ("ALL".equals(t) || "EXTERNAL".equals(t) || "IN_LAB".equals(t)) {
+            return t;
+        }
+        return null;
     }
 
     private void saveChangeLog(EquipmentEntity entity, String fieldName, String oldValue, String newValue,

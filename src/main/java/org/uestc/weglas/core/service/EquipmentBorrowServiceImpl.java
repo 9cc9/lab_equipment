@@ -109,23 +109,24 @@ public class EquipmentBorrowServiceImpl implements EquipmentBorrowService {
             AssertUtil.notBlank(request.getDestination(), "外借须填写外带目的地");
         }
 
-        String borrowerName;
-        String studentNo;
-        String phone;
-        if (UserContextHolder.isStudent()) {
-            UserContext ctx = UserContextHolder.get();
+        AssertUtil.isTrue(UserContextHolder.isStudent(), "仅同学本人可提交借用申请");
+
+        String borrowerName = StringUtils.trimToNull(request.getBorrowerName());
+        String studentNo = StringUtils.trimToNull(request.getStudentNo());
+        String phone = StringUtils.trimToNull(request.getBorrowerPhone());
+        UserContext ctx = UserContextHolder.get();
+        if (borrowerName == null) {
             borrowerName = ctx.getName();
-            studentNo = ctx.getStudentNo();
-            phone = ctx.getPhone();
-        } else {
-            assertStaff();
-            borrowerName = StringUtils.trimToNull(request.getBorrowerName());
-            studentNo = StringUtils.trimToNull(request.getStudentNo());
-            phone = StringUtils.trimToNull(request.getBorrowerPhone());
-            AssertUtil.notBlank(borrowerName, "请填写借用人姓名");
-            AssertUtil.notBlank(studentNo, "请填写学号");
-            AssertUtil.notBlank(phone, "请填写手机号");
         }
+        if (studentNo == null) {
+            studentNo = ctx.getStudentNo();
+        }
+        if (phone == null) {
+            phone = ctx.getPhone();
+        }
+        AssertUtil.notBlank(borrowerName, "请填写借用人姓名");
+        AssertUtil.notBlank(studentNo, "请填写学号");
+        AssertUtil.notBlank(phone, "请填写手机号");
 
         if (type == BorrowType.EXTERNAL) {
             EquipmentBorrowEntity existing = borrowMapper.selectActiveExternalForUpdate(equipment.getId());

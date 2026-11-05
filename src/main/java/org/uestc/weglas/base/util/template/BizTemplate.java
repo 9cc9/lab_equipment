@@ -51,6 +51,10 @@ public class BizTemplate {
         } catch (RuntimeException e) {
             innerResult.setSuccess(false);
             innerResult.setResultCode(ResultEnum.SYSTEM_EXCEPTION.getCode());
+            innerResult.setMessage(
+                    org.apache.commons.lang.StringUtils.isNotBlank(e.getMessage())
+                            ? e.getMessage()
+                            : ResultEnum.SYSTEM_EXCEPTION.getMessage());
             LogUtil.error(logger, e, "RuntimeException");
         }
 
@@ -82,6 +86,10 @@ public class BizTemplate {
         } catch (RuntimeException e) {
             innerResult.setSuccess(false);
             innerResult.setResultCode(ResultEnum.SYSTEM_EXCEPTION.getCode());
+            innerResult.setMessage(
+                    org.apache.commons.lang.StringUtils.isNotBlank(e.getMessage())
+                            ? e.getMessage()
+                            : ResultEnum.SYSTEM_EXCEPTION.getMessage());
             LogUtil.error(logger, e, "RuntimeException");
         }
 

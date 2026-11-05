@@ -44,6 +44,8 @@ public final class EquipmentDTOConverter {
                 .supplier(equipment.getSupplier())
                 .manufacturer(equipment.getManufacturer())
                 .isAbnormal(equipment.getIsAbnormal())
+                .borrowable(equipment.getBorrowable())
+                .allowedBorrowTypes(equipment.getAllowedBorrowTypes())
                 .updatedAt(equipment.getUpdatedAt())
                 .build();
     }
@@ -110,6 +112,8 @@ public final class EquipmentDTOConverter {
                 .supplier(entity.getSupplier())
                 .manufacturer(entity.getManufacturer())
                 .isAbnormal(entity.getIsAbnormal())
+                .borrowable(entity.getBorrowable())
+                .allowedBorrowTypes(entity.getAllowedBorrowTypes())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
     }

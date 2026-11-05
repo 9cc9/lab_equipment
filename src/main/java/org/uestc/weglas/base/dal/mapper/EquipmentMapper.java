@@ -21,7 +21,8 @@ public interface EquipmentMapper {
     List<EquipmentEntity> selectByRoomId(@Param("roomId") String roomId,
                                          @Param("keyword") String keyword,
                                          @Param("usageStatus") String usageStatus,
-                                         @Param("sortOrder") String sortOrder);
+                                         @Param("sortOrder") String sortOrder,
+                                         @Param("borrowType") String borrowType);
 
     List<EquipmentEntity> search(@Param("keyword") String keyword);
 

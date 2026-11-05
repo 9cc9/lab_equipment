@@ -14,6 +14,16 @@
         <if test="usageStatus != null and usageStatus != ''">
             AND usage_status = #{usageStatus}
         </if>
+        <if test="borrowType != null and borrowType != ''">
+            <choose>
+                <when test="borrowType == 'OFF'">
+                    AND (borrowable = 0 OR borrowable IS NULL)
+                </when>
+                <otherwise>
+                    AND borrowable = 1 AND allowed_borrow_types = #{borrowType}
+                </otherwise>
+            </choose>
+        </if>
         <choose>
             <when test="sortOrder == 'asc'">
                 ORDER BY updated_at ASC, asset_code

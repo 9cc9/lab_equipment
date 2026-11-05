@@ -14,7 +14,8 @@ public interface EquipmentService {
 
     Equipment queryById(String id);
 
-    List<Equipment> listByRoomCode(String roomCode, String keyword, String usageStatus, String sortOrder);
+    List<Equipment> listByRoomCode(String roomCode, String keyword, String usageStatus, String sortOrder,
+                                   String borrowType);
 
     List<Equipment> search(String keyword);
 

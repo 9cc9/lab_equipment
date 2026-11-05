@@ -79,10 +79,11 @@ public class EquipmentController {
     public BaseResult<List<EquipmentDTO>> listByRoom(@PathVariable("roomCode") String roomCode,
                                                      @RequestParam(value = "keyword", required = false) String keyword,
                                                      @RequestParam(value = "usageStatus", required = false) String usageStatus,
-                                                     @RequestParam(value = "sortOrder", required = false, defaultValue = "desc") String sortOrder) {
+                                                     @RequestParam(value = "sortOrder", required = false, defaultValue = "desc") String sortOrder,
+                                                     @RequestParam(value = "borrowType", required = false) String borrowType) {
         final EquipmentService eqSvc = equipmentService;
         return ControllerBizRunner.run(result -> {
-            List<Equipment> list = eqSvc.listByRoomCode(roomCode, keyword, usageStatus, sortOrder);
+            List<Equipment> list = eqSvc.listByRoomCode(roomCode, keyword, usageStatus, sortOrder, borrowType);
             List<EquipmentDTO> dtoList = new ArrayList<>();
             for (Equipment equipment : list) {
                 dtoList.add(EquipmentDTOConverter.toDTO(equipment));

@@ -35,5 +35,7 @@ public class Equipment {
     private String supplier;
     private String manufacturer;
     private Boolean isAbnormal;
+    private Boolean borrowable;
+    private String allowedBorrowTypes;
     private Date updatedAt;
 }
