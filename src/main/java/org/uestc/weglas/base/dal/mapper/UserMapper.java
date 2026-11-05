@@ -14,7 +14,10 @@ public interface UserMapper {
     @Select("SELECT * FROM le_user WHERE username = #{username}")
     UserEntity selectByUsername(@Param("username") String username);
 
-    @Insert("INSERT INTO le_user (id, username, name, password, status, created_at, updated_at) "
-            + "VALUES (#{id}, #{username}, #{name}, #{password}, #{status}, #{createdAt}, #{updatedAt})")
+    @Select("SELECT * FROM le_user WHERE student_no = #{studentNo}")
+    UserEntity selectByStudentNo(@Param("studentNo") String studentNo);
+
+    @Insert("INSERT INTO le_user (id, username, name, password, status, user_type, student_no, phone, created_at, updated_at) "
+            + "VALUES (#{id}, #{username}, #{name}, #{password}, #{status}, #{userType}, #{studentNo}, #{phone}, #{createdAt}, #{updatedAt})")
     int insert(UserEntity entity);
 }

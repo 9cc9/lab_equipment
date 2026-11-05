@@ -12,6 +12,9 @@ public class UserEntity {
     private String name;
     private String password;
     private String status;
+    private String userType;
+    private String studentNo;
+    private String phone;
     private Date createdAt;
     private Date updatedAt;
 }

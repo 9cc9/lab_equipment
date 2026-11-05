@@ -38,7 +38,9 @@ public class UserContext implements Serializable {
     private String name;
 
     /**
-     * 用户类型（CUSTOMER/MERCHANT）
+     * 用户类型 ADMIN / ASSISTANT / STUDENT
      */
     private String userType;
+
+    private String studentNo;
 }

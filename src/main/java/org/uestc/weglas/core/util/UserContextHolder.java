@@ -78,6 +78,17 @@ public class UserContextHolder {
         return context != null && "ADMIN".equals(context.getUserType());
     }
 
+    public static boolean isStudent() {
+        UserContext context = CONTEXT_HOLDER.get();
+        return context != null && "STUDENT".equals(context.getUserType());
+    }
+
+    public static boolean isStaff() {
+        UserContext context = CONTEXT_HOLDER.get();
+        return context != null
+                && ("ADMIN".equals(context.getUserType()) || "ASSISTANT".equals(context.getUserType()));
+    }
+
     /**
      * 清除用户上下文
      * 必须在请求结束时调用，避免内存泄漏

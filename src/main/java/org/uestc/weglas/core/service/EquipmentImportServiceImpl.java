@@ -229,6 +229,12 @@ public class EquipmentImportServiceImpl implements EquipmentImportService {
         entity.setCardStatus(getCellString(row, headerIndex.get("卡片状态")));
         entity.setUsageStatus(getCellString(row, headerIndex.get("现状")));
         entity.setStatus(Status.ENABLED.getCode());
+        if (entity.getBorrowable() == null) {
+            entity.setBorrowable(Boolean.FALSE);
+        }
+        if (StringUtils.isBlank(entity.getAllowedBorrowTypes())) {
+            entity.setAllowedBorrowTypes("ALL");
+        }
         entity.setRoomId(room != null ? room.getId() : null);
         entity.setLocationRaw(parsed.getRaw());
         entity.setLocationNote(parsed.getNote());

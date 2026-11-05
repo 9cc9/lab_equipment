@@ -28,10 +28,12 @@ public final class LoginSessionHelper {
                                                    long ttlSeconds) {
         String sessionToken = UUID.randomUUID().toString();
 
+        String phone = StringUtils.isNotBlank(user.getPhone()) ? user.getPhone() : user.getUsername();
         UserContext userContext = UserContext.builder()
                 .userId(user.getId())
-                .phone(user.getUsername())
+                .phone(phone)
                 .name(user.getName())
+                .studentNo(user.getStudentNo())
                 .userType(StringUtils.isNotBlank(user.getUserType()) ? user.getUserType() : "ADMIN")
                 .build();
 
@@ -47,6 +49,8 @@ public final class LoginSessionHelper {
                 .username(user.getUsername())
                 .name(user.getName())
                 .userType(userContext.getUserType())
+                .studentNo(user.getStudentNo())
+                .phone(phone)
                 .build();
 
         return LoginResponse.builder()

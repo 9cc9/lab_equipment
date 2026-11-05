@@ -21,7 +21,8 @@ public class IdGenerator {
         USER("USR"),
         EQUIPMENT("EQP"),
         ROOM("ROM"),
-        CHANGE_LOG("CHG");
+        CHANGE_LOG("CHG"),
+        BORROW("BRW");
 
         private final String prefix;
 

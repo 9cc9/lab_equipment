@@ -60,7 +60,7 @@ app:
     allow-private-network: true
   session:
     ttl-seconds: 259200
-    exclude-paths: /login.json
+    exclude-paths: /login.json,/student/login.json
 
 mybatis:
   configuration:

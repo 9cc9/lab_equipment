@@ -51,6 +51,10 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Lazy
     private EquipmentService equipmentService;
 
+    @Autowired
+    @Lazy
+    private EquipmentBorrowService equipmentBorrowService;
+
     @Override
     public Equipment queryByAssetCode(String assetCode) {
         AssertUtil.notBlank(assetCode, "设备编号不能为空");
@@ -101,6 +105,7 @@ public class EquipmentServiceImpl implements EquipmentService {
     public Equipment updateStatus(String assetCode, UpdateEquipmentStatusRequest request,
                                   String operatorId, String operatorName) {
         EquipmentEntity entity = requireEnabledByAssetCode(assetCode.trim());
+        equipmentBorrowService.assertNoActiveBorrowConflict(entity.getId(), request.getUsageStatus());
 
         Room room = roomService.getOrCreateByRoomCode(request.getRoomCode(), entity.getBuilding());
         AssertUtil.notNull(room, "房间无效");

@@ -32,6 +32,8 @@ public class EquipmentEntity {
     private String supplier;
     private String manufacturer;
     private Boolean isAbnormal;
+    private Boolean borrowable;
+    private String allowedBorrowTypes;
     private String extInfo;
     private Date createdAt;
     private Date updatedAt;

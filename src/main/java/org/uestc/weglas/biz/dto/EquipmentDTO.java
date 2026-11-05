@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -35,5 +36,10 @@ public class EquipmentDTO {
     private String supplier;
     private String manufacturer;
     private Boolean isAbnormal;
+    private Boolean borrowable;
+    private String allowedBorrowTypes;
+    private Boolean externalBorrowBlocked;
+    private Integer inLabActiveCount;
+    private List<ActiveBorrowDTO> activeBorrows;
     private Date updatedAt;
 }

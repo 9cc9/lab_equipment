@@ -28,6 +28,11 @@ public interface EquipmentMapper {
     @Select("SELECT * FROM le_equipment WHERE status = 'ENABLED' ORDER BY asset_code")
     List<EquipmentEntity> selectAll();
 
+    @Select("SELECT * FROM le_equipment WHERE status = 'ENABLED' AND borrowable = 1 ORDER BY asset_code")
+    List<EquipmentEntity> selectBorrowable();
+
+    int updateBorrowFlags(EquipmentEntity entity);
+
     int insert(EquipmentEntity entity);
 
     int updateById(EquipmentEntity entity);

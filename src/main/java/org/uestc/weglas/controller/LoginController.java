@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.uestc.weglas.base.util.BaseResult;
 import org.uestc.weglas.base.util.exception.AssertUtil;
-import org.uestc.weglas.base.util.template.AbstractBizCallback;
-import org.uestc.weglas.base.util.template.BizTemplate;
 import org.uestc.weglas.base.util.validator.RequestValidator;
 import org.uestc.weglas.biz.dto.LoginRequest;
 import org.uestc.weglas.biz.dto.LoginResponse;
+import org.uestc.weglas.biz.dto.StudentLoginRequest;
 import org.uestc.weglas.controller.helper.LoginSessionHelper;
+import org.uestc.weglas.controller.support.ControllerBizRunner;
 import org.uestc.weglas.core.model.User;
 import org.uestc.weglas.core.service.SessionService;
 import org.uestc.weglas.core.service.UserService;
@@ -35,31 +35,41 @@ public class LoginController {
     @PostMapping("/login.json")
     public BaseResult<LoginResponse> login(@RequestBody LoginRequest request,
                                            HttpServletResponse httpResponse) {
-        return BizTemplate.execute(new AbstractBizCallback<LoginResponse>() {
-            @Override
-            public void checkParameter() {
-                RequestValidator.valid(request);
-            }
+        final UserService userSvc = userService;
+        final SessionService sessionSvc = sessionService;
+        final long ttlSeconds = sessionTtlSeconds;
+        return ControllerBizRunner.runWithCheck(
+                () -> RequestValidator.valid(request),
+                result -> {
+                    User user = userSvc.login(request.getAccount(), request.getPassword());
+                    AssertUtil.notNull(user, "用户名或密码错误");
+                    result.setData(LoginSessionHelper.createLoginSession(
+                            user, httpResponse, sessionSvc, ttlSeconds));
+                });
+    }
 
-            @Override
-            public void execute(BaseResult<LoginResponse> result) {
-                User user = userService.login(request.getAccount(), request.getPassword());
-                AssertUtil.notNull(user, "用户名或密码错误");
-                LoginResponse response = LoginSessionHelper.createLoginSession(
-                        user, httpResponse, sessionService, sessionTtlSeconds);
-                result.setData(response);
-            }
-        });
+    @PostMapping("/student/login.json")
+    public BaseResult<LoginResponse> studentLogin(@RequestBody StudentLoginRequest request,
+                                                  HttpServletResponse httpResponse) {
+        final UserService userSvc = userService;
+        final SessionService sessionSvc = sessionService;
+        final long ttlSeconds = sessionTtlSeconds;
+        return ControllerBizRunner.runWithCheck(
+                () -> RequestValidator.valid(request),
+                result -> {
+                    User user = userSvc.loginStudent(request);
+                    AssertUtil.notNull(user, "学号或手机号不正确");
+                    result.setData(LoginSessionHelper.createLoginSession(
+                            user, httpResponse, sessionSvc, ttlSeconds));
+                });
     }
 
     @PostMapping("/logout.json")
     public BaseResult<Void> logout(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        return BizTemplate.execute(new AbstractBizCallback<Void>() {
-            @Override
-            public void execute(BaseResult<Void> result) {
-                LoginSessionHelper.destroyLoginSession(httpRequest, httpResponse, sessionService);
-                result.setData(null);
-            }
+        final SessionService sessionSvc = sessionService;
+        return ControllerBizRunner.run(result -> {
+            LoginSessionHelper.destroyLoginSession(httpRequest, httpResponse, sessionSvc);
+            result.setData(null);
         });
     }
 }
