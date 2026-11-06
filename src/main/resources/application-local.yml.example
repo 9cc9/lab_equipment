@@ -1,0 +1,9 @@
+# 复制为 application-local.yml（已 gitignore），本地开发注入 OSS 密钥：
+#   spring.profiles.active=dev,local
+#
+# 或在 IDE / shell 中设置环境变量 OSS_ACCESS_KEY_ID、OSS_ACCESS_KEY_SECRET
+
+app:
+  oss:
+    access-key-id: 你的AccessKeyId
+    access-key-secret: 你的AccessKeySecret

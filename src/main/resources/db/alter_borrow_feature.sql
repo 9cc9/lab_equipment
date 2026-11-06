@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS `le_equipment_borrow` (
     `borrower_name`         VARCHAR(64)  NOT NULL,
     `student_no`            VARCHAR(64)  NOT NULL,
     `borrower_phone`        VARCHAR(32) NOT NULL,
+    `identity_proof_url`    VARCHAR(512) NULL COMMENT '学生身份证明 OSS URL',
     `purpose`               VARCHAR(256) NULL,
     `destination`           VARCHAR(256) NULL,
     `remark`                VARCHAR(512) NULL,

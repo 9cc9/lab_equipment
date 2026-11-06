@@ -21,6 +21,7 @@ public class BorrowApplicationDTO {
     private String borrowerName;
     private String studentNo;
     private String borrowerPhone;
+    private String identityProofUrl;
     private String purpose;
     private String destination;
     private String remark;

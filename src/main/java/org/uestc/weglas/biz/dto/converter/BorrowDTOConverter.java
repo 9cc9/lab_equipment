@@ -31,6 +31,7 @@ public final class BorrowDTOConverter {
                 .borrowerName(entity.getBorrowerName())
                 .studentNo(entity.getStudentNo())
                 .borrowerPhone(entity.getBorrowerPhone())
+                .identityProofUrl(entity.getIdentityProofUrl())
                 .purpose(entity.getPurpose())
                 .destination(entity.getDestination())
                 .remark(entity.getRemark())

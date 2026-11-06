@@ -54,6 +54,9 @@ public class EquipmentBorrowServiceImpl implements EquipmentBorrowService {
     private IdGenerator idGenerator;
 
     @Autowired
+    private AliyunOssService aliyunOssService;
+
+    @Autowired
     @Lazy
     private EquipmentBorrowService equipmentBorrowService;
 
@@ -128,6 +131,10 @@ public class EquipmentBorrowServiceImpl implements EquipmentBorrowService {
         AssertUtil.notBlank(studentNo, "请填写学号");
         AssertUtil.notBlank(phone, "请填写手机号");
 
+        String identityProofUrl = StringUtils.trimToNull(request.getIdentityProofUrl());
+        AssertUtil.notBlank(identityProofUrl, "请上传身份证明");
+        AssertUtil.isTrue(aliyunOssService.isValidStoredUrl(identityProofUrl), "身份证明无效，请重新上传");
+
         if (type == BorrowType.EXTERNAL) {
             EquipmentBorrowEntity existing = borrowMapper.selectActiveExternalForUpdate(equipment.getId());
             AssertUtil.isTrue(existing == null, "该设备外借占用中");
@@ -149,6 +156,7 @@ public class EquipmentBorrowServiceImpl implements EquipmentBorrowService {
         application.setBorrowerName(borrowerName);
         application.setStudentNo(studentNo);
         application.setBorrowerPhone(phone);
+        application.setIdentityProofUrl(identityProofUrl);
         application.setPurpose(StringUtils.trimToNull(request.getPurpose()));
         application.setDestination(StringUtils.trimToNull(request.getDestination()));
         application.setRemark(StringUtils.trimToNull(request.getRemark()));

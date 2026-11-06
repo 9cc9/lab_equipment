@@ -2,11 +2,15 @@ package org.uestc.weglas.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.uestc.weglas.base.util.BaseResult;
 import org.uestc.weglas.base.util.validator.RequestValidator;
 import org.uestc.weglas.biz.dto.*;
 import org.uestc.weglas.controller.support.ControllerBizRunner;
+import org.uestc.weglas.base.util.exception.AssertUtil;
+import org.uestc.weglas.core.service.AliyunOssService;
 import org.uestc.weglas.core.service.EquipmentBorrowService;
+import org.uestc.weglas.core.model.UserContext;
 import org.uestc.weglas.core.util.UserContextHolder;
 
 import java.util.List;
@@ -16,6 +20,9 @@ public class BorrowController {
 
     @Autowired
     private EquipmentBorrowService equipmentBorrowService;
+
+    @Autowired
+    private AliyunOssService aliyunOssService;
 
     @GetMapping("/borrow/equipment.json")
     public BaseResult<List<BorrowEquipmentDTO>> listBorrowable(
@@ -32,6 +39,17 @@ public class BorrowController {
         final EquipmentBorrowService svc = equipmentBorrowService;
         return ControllerBizRunner.run(result ->
                 result.setData(svc.getBorrowEquipmentDetail(assetCode, UserContextHolder.isStudent())));
+    }
+
+    @PostMapping("/borrow/upload-identity-proof.json")
+    public BaseResult<IdentityProofUploadDTO> uploadIdentityProof(@RequestParam("file") MultipartFile file) {
+        final MultipartFile uploadFile = file;
+        return ControllerBizRunner.run(result -> {
+            AssertUtil.isTrue(UserContextHolder.isStudent(), "仅同学可上传身份证明");
+            UserContext ctx = UserContextHolder.get();
+            String url = aliyunOssService.uploadStudentIdentityProof(ctx.getStudentNo(), uploadFile);
+            result.setData(new IdentityProofUploadDTO(url));
+        });
     }
 
     @PostMapping("/borrow/applications.json")

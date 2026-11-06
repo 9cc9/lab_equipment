@@ -6,13 +6,13 @@
         INSERT INTO le_equipment_borrow (
             id, equipment_id, asset_code, equipment_name, borrow_type, status,
             expected_start_at, expected_end_at, actual_start_at, actual_end_at,
-            borrower_name, student_no, borrower_phone, purpose, destination, remark,
+            borrower_name, student_no, borrower_phone, identity_proof_url, purpose, destination, remark,
             applicant_user_id, approver_id, approver_name, approve_remark, approved_at,
             returner_id, returner_name, return_remark, prev_usage_status, created_at, updated_at
         ) VALUES (
             #{id}, #{equipmentId}, #{assetCode}, #{equipmentName}, #{borrowType}, #{status},
             #{expectedStartAt}, #{expectedEndAt}, #{actualStartAt}, #{actualEndAt},
-            #{borrowerName}, #{studentNo}, #{borrowerPhone}, #{purpose}, #{destination}, #{remark},
+            #{borrowerName}, #{studentNo}, #{borrowerPhone}, #{identityProofUrl}, #{purpose}, #{destination}, #{remark},
             #{applicantUserId}, #{approverId}, #{approverName}, #{approveRemark}, #{approvedAt},
             #{returnerId}, #{returnerName}, #{returnRemark}, #{prevUsageStatus}, #{createdAt}, #{updatedAt}
         )

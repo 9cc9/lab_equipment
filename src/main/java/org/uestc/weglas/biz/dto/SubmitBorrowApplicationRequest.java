@@ -20,6 +20,8 @@ public class SubmitBorrowApplicationRequest {
     private String borrowerName;
     private String studentNo;
     private String borrowerPhone;
+    @NotBlank(message = "请上传身份证明")
+    private String identityProofUrl;
     @NotBlank(message = "请填写借用用途")
     @Size(min = 4, max = 256, message = "借用用途至少 4 个字，请写清楚原因")
     private String purpose;
