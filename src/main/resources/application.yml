@@ -18,7 +18,8 @@ spring:
   application:
     name: lab_equipment
   profiles:
-    active: dev
+    # local：加载 application-local.yml（gitignore，本机 OSS 等密钥）
+    active: dev,local
   aop:
     auto: true
     proxy-target-class: true
@@ -64,8 +65,6 @@ app:
   oss:
     enabled: true
     endpoint: oss-cn-beijing.aliyuncs.com
-    access-key-id: ${OSS_ACCESS_KEY_ID:}
-    access-key-secret: ${OSS_ACCESS_KEY_SECRET:}
     bucket-name: order-merchant-image
     domain:
     object-prefix: lab_equipment

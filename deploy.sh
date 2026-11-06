@@ -14,6 +14,8 @@ XMX="512M"
 METASPACE="128M"
 MAX_METASPACE="128M"
 LOG_DIR="/home/admin/logs/${APP_NAME}"
+# 服务器本地密钥（不进 Git）；deploy 启动前自动加载
+SECRETS_FILE="/home/admin/app/${APP_NAME}/secrets.env"
 ##############################################################################
 
 JVM_OPTS="-server \
@@ -49,6 +51,24 @@ create_log_dir() {
         mkdir -p "${LOG_DIR}"
         echo "创建日志目录成功：${LOG_DIR}"
     fi
+}
+
+load_runtime_env() {
+    if [ ! -f "${SECRETS_FILE}" ]; then
+        echo "WARNING: 未找到 ${SECRETS_FILE}"
+        echo "         OSS 上传等能力需要在此文件配置 OSS_ACCESS_KEY_ID / OSS_ACCESS_KEY_SECRET"
+        echo "         可参考仓库内 secrets.env.example"
+        return 0
+    fi
+    if [ ! -r "${SECRETS_FILE}" ]; then
+        echo "ERROR: 无法读取 ${SECRETS_FILE}，请检查权限（建议 chmod 600）"
+        exit 1
+    fi
+    set -a
+    # shellcheck disable=SC1090
+    . "${SECRETS_FILE}"
+    set +a
+    echo "已加载运行时密钥：${SECRETS_FILE}"
 }
 
 verify_pid() {
@@ -97,6 +117,7 @@ get_pid() {
 start() {
     check_jar_exists
     create_log_dir
+    load_runtime_env
 
     PID=$(get_pid)
     if [ -n "${PID}" ]; then
