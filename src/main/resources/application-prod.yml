@@ -1,4 +1,14 @@
 # 生产部署（deploy.sh 使用 -Dspring.profiles.active=prod）
+# 上传临时目录勿用 /tmp：tmpfs 清理或重启后 Tomcat work 会消失，multipart 解析会失败
+server:
+  tomcat:
+    basedir: /home/admin/app/lab_equipment/tomcat-work
+
+spring:
+  servlet:
+    multipart:
+      location: /home/admin/app/lab_equipment/uploads-tmp
+
 app:
   oss:
     endpoint: oss-cn-beijing.aliyuncs.com

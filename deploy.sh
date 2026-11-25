@@ -14,8 +14,11 @@ XMX="512M"
 METASPACE="128M"
 MAX_METASPACE="128M"
 LOG_DIR="/home/admin/logs/${APP_NAME}"
+APP_HOME="/home/admin/app/${APP_NAME}"
+TOMCAT_WORK="${APP_HOME}/tomcat-work"
+UPLOAD_TMP="${APP_HOME}/uploads-tmp"
 # 服务器本地密钥（不进 Git）；deploy 启动前自动加载
-SECRETS_FILE="/home/admin/app/${APP_NAME}/secrets.env"
+SECRETS_FILE="${APP_HOME}/secrets.env"
 ##############################################################################
 
 JVM_OPTS="-server \
@@ -51,6 +54,15 @@ create_log_dir() {
         mkdir -p "${LOG_DIR}"
         echo "创建日志目录成功：${LOG_DIR}"
     fi
+}
+
+create_upload_work_dirs() {
+    for dir in "${TOMCAT_WORK}" "${UPLOAD_TMP}"; do
+        if [ ! -d "${dir}" ]; then
+            mkdir -p "${dir}"
+            echo "创建上传/工作目录成功：${dir}"
+        fi
+    done
 }
 
 load_runtime_env() {
@@ -117,6 +129,7 @@ get_pid() {
 start() {
     check_jar_exists
     create_log_dir
+    create_upload_work_dirs
     load_runtime_env
 
     PID=$(get_pid)
